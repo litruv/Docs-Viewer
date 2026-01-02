@@ -15,6 +15,10 @@ export class SearchService {
         this.indexService = indexService;
         /** @type {Array<SearchIndexItem>} */
         this.searchIndex = [];
+        /** @type {Map<string, Array<SearchResult>>} */
+        this.searchCache = new Map();
+        /** @type {number} */
+        this.cacheMaxSize = 50;
     }
 
     /**
@@ -23,6 +27,7 @@ export class SearchService {
      */
     buildSearchIndex(documents) {
         this.searchIndex = [];
+        this.searchCache.clear();
         this.processDocuments(documents);
     }
 
@@ -132,11 +137,23 @@ export class SearchService {
         if (!query) return [];
         query = query.toLowerCase();
 
-        return this.searchIndex
+        if (this.searchCache.has(query)) {
+            return this.searchCache.get(query);
+        }
+
+        const results = this.searchIndex
             .map(item => this.scoreItem(item, query))
             .filter(item => item.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10);
+
+        if (this.searchCache.size >= this.cacheMaxSize) {
+            const firstKey = this.searchCache.keys().next().value;
+            this.searchCache.delete(firstKey);
+        }
+        this.searchCache.set(query, results);
+
+        return results;
     }
 
     /**
@@ -159,6 +176,13 @@ export class SearchService {
         if (item.type === 'header') score += 5;
 
         return { ...item, score };
+    }
+
+    /**
+     * Clears the search result cache.
+     */
+    clearCache() {
+        this.searchCache.clear();
     }
 }
 

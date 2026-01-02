@@ -15,6 +15,10 @@ export class DocumentService {
         this.indexService = indexService;
         /** @type {Promise<marked>} */
         this.markedPromise = this.initializeMarked();
+        /** @type {Map<string, LoadedDocument>} */
+        this.documentCache = new Map();
+        /** @type {number} */
+        this.cacheMaxSize = 20;
     }
 
     /**
@@ -50,8 +54,15 @@ export class DocumentService {
      */
     setupRenderer(renderer) {
         const originalLink = renderer.link.bind(renderer);
+        const originalImage = renderer.image.bind(renderer);
 
         renderer.code = this.renderCode;
+        
+        renderer.image = (href, title, text) => {
+            const titleAttr = title ? ` title="${title}"` : '';
+            return `<img src="${href}" alt="${text}"${titleAttr} loading="lazy">`;
+        };
+
         renderer.link = (href, title, text) => {
             const isExternal = href.startsWith('http');
             const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
@@ -138,6 +149,10 @@ export class DocumentService {
      * @throws {Error} If the document fails to load.
      */
     async loadDocument(path) {
+        if (this.documentCache.has(path)) {
+            return this.documentCache.get(path);
+        }
+
         try {
             const [response, marked] = await Promise.all([
                 fetch(path),
@@ -163,12 +178,20 @@ export class DocumentService {
             const titleContent = metadata.title || indexDoc?.title || path.split('/').pop().replace('.md', '');
             processedContent = this.ensureTitle(processedContent, titleContent);
 
-            return {
+            const result = {
                 content: processedContent,
                 metadata,
                 marked,
                 title: titleContent
             };
+
+            if (this.documentCache.size >= this.cacheMaxSize) {
+                const firstKey = this.documentCache.keys().next().value;
+                this.documentCache.delete(firstKey);
+            }
+            this.documentCache.set(path, result);
+
+            return result;
         } catch (error) {
             throw new Error('Failed to load document');
         }
@@ -239,14 +262,29 @@ export class DocumentService {
             const mediaPath = `./docs/images/${filename}`;
 
             if (filename.toLowerCase().endsWith('.mp4')) {
-                return `\n<video controls width="100%">
+                return `\n<video controls width="100%" preload="metadata">
                     <source src="${mediaPath}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>\n\n`;
             }
 
-            return `\n![${filename}](${mediaPath})\n\n`;
+            return `\n<img src="${mediaPath}" alt="${filename}" loading="lazy">\n\n`;
         });
+    }
+
+    /**
+     * Clears the entire document cache.
+     */
+    clearCache() {
+        this.documentCache.clear();
+    }
+
+    /**
+     * Invalidates a specific document from the cache.
+     * @param {string} path - The document path to invalidate.
+     */
+    invalidateDocument(path) {
+        this.documentCache.delete(path);
     }
 }
 
