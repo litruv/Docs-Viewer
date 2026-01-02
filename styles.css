@@ -131,7 +131,7 @@ body {
     border-bottom: 1px solid var(--ifm-border-color);
 }
 
-search-result:last-child {
+.search-result:last-child {
     border-bottom: none;
 }
 
