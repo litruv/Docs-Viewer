@@ -126,18 +126,18 @@ To use the plugin:
 
 ```
 .
-├── docs/               # Documentation files
-├── js/                 # Application modules
-│   ├── EventBus.js     # Pub-sub event system
-│   ├── IndexService.js # Document index management
-│   ├── SearchService.js# Search with caching
-│   ├── DOMService.js   # DOM manipulation & accessibility
-│   ├── DocumentService.js # Markdown loading & caching
+├── docs/                    # Documentation files
+├── js/                      # Application modules
+│   ├── EventBus.js          # Pub-sub event system
+│   ├── IndexService.js      # Document index management
+│   ├── SearchService.js     # Search with caching
+│   ├── DOMService.js        # DOM manipulation & accessibility
+│   ├── DocumentService.js   # Markdown loading & caching
 │   ├── NavigationService.js # Browser history handling
-│   └── Documentation.js # Main orchestrator
-├── build-docs.js       # Documentation builder
-├── index.html          # Main viewer
-└── styles.css          # Styling
+│   └── Documentation.js     # Main orchestrator
+├── build-docs.js            # Documentation builder
+├── index.html               # Main viewer
+└── styles.css               # Styling
 ```
 
 ### Architecture
