@@ -1,3 +1,13 @@
+    /**
+     * Shows or hides the Docs link in the sidebar based on config.
+     * @param {boolean} show - Whether to show the Docs link.
+     */
+    setShowDocsLink(show) {
+        const docsLink = document.querySelector('.github-link');
+        if (docsLink) {
+            docsLink.style.display = show ? '' : 'none';
+        }
+    }
 /**
  * Service responsible for DOM manipulation and UI rendering.
  * @class DOMService

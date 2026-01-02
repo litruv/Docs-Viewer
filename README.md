@@ -203,10 +203,10 @@ For improved SEO and social sharing, you can use a Cloudflare Worker to dynamica
 
 ### index.json
 
-
 ```json
 {
   "defaultPage": "home",
+  "showDocsLink": true, 
   "metadata": {
     "title": "Site Title",
     "description": "Site description",
@@ -225,6 +225,8 @@ For improved SEO and social sharing, you can use a Cloudflare Worker to dynamica
   }
 }
 ```
+
+The `showDocsLink` option controls whether a "Docs" link is shown in the UI navigation. Set to `false` to hide it.
 
 The build process generates the documents part for `index.json`
 ## Contributing

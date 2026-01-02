@@ -172,6 +172,9 @@ class Documentation {
                 this.loadCustomCSS(data.customCSS);
             }
 
+            // Show/hide Docs link in sidebar
+            this.domService.setShowDocsLink(data.showDocsLink !== false);
+
             this.searchService.buildSearchIndex(this.indexData.documents);
             this.domService.setupSearch(this.searchService);
 
