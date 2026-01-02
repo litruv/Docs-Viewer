@@ -4,14 +4,16 @@ A modern, accessible documentation viewer for Markdown files with live search, n
 
 ## Features
 
-- 🔍 Live search with keyboard shortcuts (Alt+S)
-- 📱 Mobile-friendly responsive design
-- 🎯 Keyboard navigation support
-- 📑 Auto-generated document outline
-- 🔗 Wiki-style internal linking
-- 🖨️ Print-friendly styling
-- ♿ ARIA-compliant accessibility
-- 🌙 Dark theme
+- 🔍 **Live search** with keyboard shortcuts (Alt+S) and result caching
+- 📱 **Mobile-friendly** responsive design with focus trap
+- 🎯 **Keyboard navigation** support (arrow keys, Enter, Escape)
+- 📑 **Auto-generated document outline** with collapsible headers
+- 🔗 **Wiki-style internal linking** with `[[Page Title]]` syntax
+- 🖨️ **Print-friendly** styling
+- ♿ **ARIA-compliant accessibility** (aria-current, role attributes, focus management)
+- 🌙 **Dark theme** with CSS custom properties
+- ⚡ **Performance optimized** with document caching and lazy loading
+- 📊 **Loading indicators** with animated progress bars
 
 ## Quick Start
 
@@ -124,12 +126,29 @@ To use the plugin:
 
 ```
 .
-├── docs/           # Documentation files
-├── build-docs.js   # Documentation builder
-├── index.html      # Main viewer
-├── index.js        # Application logic
-└── styles.css      # Styling
+├── docs/               # Documentation files
+├── js/                 # Application modules
+│   ├── EventBus.js     # Pub-sub event system
+│   ├── IndexService.js # Document index management
+│   ├── SearchService.js# Search with caching
+│   ├── DOMService.js   # DOM manipulation & accessibility
+│   ├── DocumentService.js # Markdown loading & caching
+│   ├── NavigationService.js # Browser history handling
+│   └── Documentation.js # Main orchestrator
+├── build-docs.js       # Documentation builder
+├── index.html          # Main viewer
+└── styles.css          # Styling
 ```
+
+### Architecture
+
+The application uses a modular ES6 architecture with:
+
+- **EventBus**: Pub-sub pattern for decoupled communication between services
+- **Services**: Single-responsibility modules for search, DOM, documents, and navigation
+- **Caching**: LRU caches for search results (50 entries) and documents (20 entries)
+- **Lazy Loading**: Images use `loading="lazy"` for improved performance
+
 
 ### Building
 
@@ -200,6 +219,12 @@ The build process generates the documents part for `index.json`
 1. Fork the repository
 2. Create a feature branch
 3. Submit a pull request
+
+## Dependencies
+
+- [marked.js](https://marked.js.org/) - Markdown parsing
+- [highlight.js](https://highlightjs.org/) - Syntax highlighting
+- [Font Awesome](https://fontawesome.com/) - Icons
 
 ## License
 
