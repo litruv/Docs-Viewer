@@ -36,10 +36,73 @@ export class DOMService {
         this.elements.menuButton.addEventListener('click', () => {
             const isExpanded = this.elements.leftSidebar.classList.toggle('show');
             this.elements.menuButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+            
+            if (isExpanded) {
+                this.enableFocusTrap();
+            } else {
+                this.disableFocusTrap();
+            }
         });
 
-        this.elements.content.addEventListener('click', () =>
-            this.elements.leftSidebar.classList.remove('show'));
+        this.elements.content.addEventListener('click', () => {
+            this.elements.leftSidebar.classList.remove('show');
+            this.elements.menuButton.setAttribute('aria-expanded', 'false');
+            this.disableFocusTrap();
+        });
+    }
+
+    /**
+     * Enables focus trap within the mobile sidebar.
+     * @private
+     */
+    enableFocusTrap() {
+        this.focusTrapHandler = (e) => {
+            if (window.innerWidth > 1000) return;
+            if (!this.elements.leftSidebar.classList.contains('show')) return;
+
+            const focusableElements = this.elements.leftSidebar.querySelectorAll(
+                'a[href], button, input, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+
+            if (e.key === 'Tab') {
+                if (e.shiftKey && document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+
+            if (e.key === 'Escape') {
+                this.elements.leftSidebar.classList.remove('show');
+                this.elements.menuButton.setAttribute('aria-expanded', 'false');
+                this.elements.menuButton.focus();
+                this.disableFocusTrap();
+            }
+        };
+
+        document.addEventListener('keydown', this.focusTrapHandler);
+        
+        const firstFocusable = this.elements.leftSidebar.querySelector(
+            'a[href], button, input, [tabindex]:not([tabindex="-1"])'
+        );
+        if (firstFocusable) {
+            firstFocusable.focus();
+        }
+    }
+
+    /**
+     * Disables the focus trap.
+     * @private
+     */
+    disableFocusTrap() {
+        if (this.focusTrapHandler) {
+            document.removeEventListener('keydown', this.focusTrapHandler);
+            this.focusTrapHandler = null;
+        }
     }
 
     /**
@@ -182,7 +245,13 @@ export class DOMService {
      */
     updateActiveDocument(path) {
         this.elements.fileIndex.querySelectorAll('a').forEach(link => {
-            link.classList.toggle('active', link.dataset.path === path);
+            const isActive = link.dataset.path === path;
+            link.classList.toggle('active', isActive);
+            if (isActive) {
+                link.setAttribute('aria-current', 'page');
+            } else {
+                link.removeAttribute('aria-current');
+            }
         });
     }
 
