@@ -373,3 +373,6 @@ class Documentation {
 
 window.originalDocTitle = document.title;
 const docs = new Documentation();
+
+// Expose to global scope for console access
+window.docs = docs;
