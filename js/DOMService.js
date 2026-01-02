@@ -224,11 +224,13 @@ export class DOMService {
         link.href = `?${doc.slug}`;
         link.textContent = doc.title || doc.path.split('/').pop().replace('.md', '');
         link.dataset.path = doc.path;
+        link.dataset.slug = doc.slug;
         link.style.paddingLeft = `${(level * 0.6) + 0.8}rem`;
         link.setAttribute('role', 'treeitem');
 
         link.onclick = (e) => {
             e.preventDefault();
+            this.setLinkLoading(link);
             this.eventBus.emit('navigation:requested', { slug: doc.slug });
             history.pushState(null, '', link.href);
             if (window.innerWidth <= 1000) {
@@ -240,10 +242,29 @@ export class DOMService {
     }
 
     /**
+     * Sets a link to loading state.
+     * @param {HTMLAnchorElement} link - The link element.
+     */
+    setLinkLoading(link) {
+        this.clearAllLoading();
+        link.classList.add('loading');
+    }
+
+    /**
+     * Clears loading state from all links.
+     */
+    clearAllLoading() {
+        this.elements.fileIndex.querySelectorAll('a.loading, .folder-link.loading').forEach(link => {
+            link.classList.remove('loading');
+        });
+    }
+
+    /**
      * Updates the active document highlight in the sidebar.
      * @param {string} path - The path of the active document.
      */
     updateActiveDocument(path) {
+        this.clearAllLoading();
         this.elements.fileIndex.querySelectorAll('a').forEach(link => {
             const isActive = link.dataset.path === path;
             link.classList.toggle('active', isActive);
@@ -326,6 +347,8 @@ export class DOMService {
         folderHeader.addEventListener('click', (e) => {
             if (e.target.closest('.folder-link')) {
                 e.preventDefault();
+                const folderLink = e.target.closest('.folder-link');
+                this.setFolderLinkLoading(folderLink);
                 this.eventBus.emit('navigation:requested', { slug: doc.slug });
                 history.pushState(null, '', `?${doc.slug}`);
                 if (window.innerWidth <= 1000) {
@@ -354,6 +377,15 @@ export class DOMService {
                 }
             }
         });
+    }
+
+    /**
+     * Sets a folder link to loading state.
+     * @param {HTMLAnchorElement} link - The folder link element.
+     */
+    setFolderLinkLoading(link) {
+        this.clearAllLoading();
+        link.classList.add('loading');
     }
 
     /**

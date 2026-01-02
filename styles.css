@@ -276,6 +276,38 @@ body {
     display: block;
     padding: 0.4rem 0.8rem;
     font-size: 0.875rem;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+#file-index a.loading {
+    pointer-events: none;
+    color: var(--ifm-color-content-secondary);
+}
+
+#file-index a.loading::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--ifm-color-primary);
+    animation: loading-progress 1s ease-in-out infinite;
+}
+
+@keyframes loading-progress {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+    50% {
+        width: 70%;
+        left: 0;
+    }
+    100% {
+        width: 0%;
+        left: 100%;
+    }
 }
 
 #file-index a:hover {
@@ -334,6 +366,21 @@ body {
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+    transition: opacity 0.2s ease;
+}
+
+.folder-link.loading {
+    opacity: 1;
+    color: var(--ifm-color-primary);
+}
+
+.folder-link.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .folder-header:hover .folder-link {
